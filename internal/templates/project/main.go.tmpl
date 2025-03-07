@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"log"
 
-	"{{.ProjectName}}/config"
+	"project/config"
+
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
 	// Load configuration
-	config, err := config.Load()
+	cfg, err := config.Load()
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
@@ -20,15 +22,18 @@ func main() {
 	e := echo.New()
 
 	// Middleware
-	e.Use(middleware.Logger())
+	e.Use(middleware.CORSWithConfig(config.Cors()))
+	e.Use(middleware.Secure())
+	e.Use(config.CustomLogger())
 	e.Use(middleware.Recover())
+	e.Validator = &config.CustomValidator{Validator: validator.New()}
 
 	// Routes
 	e.GET("/", func(c echo.Context) error {
-		return c.String(200, "Hello, World!")
+		return c.JSON(200, echo.Map{"message": "Hello, World!"})
 	})
 
 	// Start server using the port from the configuration
-	serverAddress := fmt.Sprintf(":%d", config.Server.Port)
+	serverAddress := fmt.Sprintf(":%d", cfg.Server.Port)
 	e.Logger.Fatal(e.Start(serverAddress))
 }

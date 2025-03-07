@@ -95,7 +95,26 @@ func configTemplate(data Data) error {
 		return err
 	}
 
+	if err := os.Mkdir("config", os.ModePerm); err != nil {
+		return err
+	}
+
 	err = configGoTemplate()
+	if err != nil {
+		return err
+	}
+
+	err = corsGoTemplate()
+	if err != nil {
+		return err
+	}
+
+	err = loggerGoTemplate()
+	if err != nil {
+		return err
+	}
+
+	err = validatorGoTemplate()
 	if err != nil {
 		return err
 	}
@@ -105,9 +124,6 @@ func configTemplate(data Data) error {
 
 func configGoTemplate() error {
 	log.Info("creating /config/config.go")
-	if err := os.Mkdir("config", os.ModePerm); err != nil {
-		return err
-	}
 
 	configGoFile, err := os.Create("config/config.go")
 	if err != nil {
@@ -121,6 +137,69 @@ func configGoTemplate() error {
 	}
 
 	err = tmpl.Execute(configGoFile, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func corsGoTemplate() error {
+	log.Info("creating /config/cors.go")
+	corsGoFile, err := os.Create("config/cors.go")
+	if err != nil {
+		return err
+	}
+	defer corsGoFile.Close()
+
+	tmpl, err := template.ParseFS(templates.FS, "project/cors.go.tmpl")
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %v", err)
+	}
+
+	err = tmpl.Execute(corsGoFile, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func loggerGoTemplate() error {
+	log.Info("creating /config/logger.go")
+	loggerGoFile, err := os.Create("config/logger.go")
+	if err != nil {
+		return err
+	}
+	defer loggerGoFile.Close()
+
+	tmpl, err := template.ParseFS(templates.FS, "project/logger.go.tmpl")
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %v", err)
+	}
+
+	err = tmpl.Execute(loggerGoFile, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func validatorGoTemplate() error {
+	log.Info("creating /config/validator.go")
+	validatorGoFile, err := os.Create("config/validator.go")
+	if err != nil {
+		return err
+	}
+	defer validatorGoFile.Close()
+
+	tmpl, err := template.ParseFS(templates.FS, "project/validator.go.tmpl")
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %v", err)
+	}
+
+	err = tmpl.Execute(validatorGoFile, nil)
 	if err != nil {
 		return err
 	}

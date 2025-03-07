@@ -1,0 +1,10 @@
+package config
+
+import "github.com/labstack/echo/v4/middleware"
+
+func Cors() middleware.CORSConfig {
+	return middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+	}
+}

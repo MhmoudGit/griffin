@@ -1,0 +1,49 @@
+package config
+
+import (
+	"fmt"
+	"net/http"
+	"reflect"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/labstack/echo/v4"
+)
+
+type CustomValidator struct {
+	Validator *validator.Validate
+}
+
+func (cv *CustomValidator) Validate(i interface{}) error {
+	if err := cv.Validator.Struct(i); err != nil {
+		errors := make(map[string]string)
+		v := reflect.TypeOf(i).Elem()
+
+		for _, err := range err.(validator.ValidationErrors) {
+			field, _ := v.FieldByName(err.StructField())
+			fieldName := field.Tag.Get("json")
+			if fieldName == "" {
+				fieldName = field.Tag.Get("form")
+			}
+			if fieldName == "" {
+				fieldName = err.Field() // Fallback to struct field name
+			}
+			errors[fieldName] = getErrorMessage(err)
+		}
+
+		return echo.NewHTTPError(http.StatusUnprocessableEntity, errors)
+	}
+	return nil
+}
+
+func getErrorMessage(err validator.FieldError) string {
+	switch err.Tag() {
+	case "required":
+		return "is required"
+	case "email":
+		return "must be a valid email"
+	case "min":
+		return fmt.Sprintf("must be at least %s characters long", err.Param())
+	default:
+		return "is invalid"
+	}
+}
