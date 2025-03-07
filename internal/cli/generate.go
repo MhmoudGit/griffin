@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"fmt"
+	"griffin/internal/log"
 
 	"github.com/spf13/cobra"
 )
@@ -11,7 +11,7 @@ var generateCmd = &cobra.Command{
 	Short: "Generate Code",
 	Long:  `Generate`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("generate code")
+		log.Print("generate code")
 	},
 }
 

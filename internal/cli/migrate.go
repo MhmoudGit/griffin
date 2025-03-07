@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"fmt"
+	"griffin/internal/log"
 
 	"github.com/spf13/cobra"
 )
@@ -11,7 +11,7 @@ var migrateCmd = &cobra.Command{
 	Short: "Database Migration",
 	Long:  `Database Migration`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("run database migrations")
+		log.Print("run database migrations")
 	},
 }
 

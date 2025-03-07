@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"fmt"
+	"griffin/internal/log"
 
 	"github.com/spf13/cobra"
 )
@@ -11,7 +11,7 @@ var serverCmd = &cobra.Command{
 	Short: "Run Server",
 	Long:  `Run Server`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("run server")
+		log.Print("run server")
 	},
 }
 

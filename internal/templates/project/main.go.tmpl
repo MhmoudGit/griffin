@@ -1,0 +1,23 @@
+package main
+
+import (
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+)
+
+func main() {
+	// Create a new Echo instance
+	e := echo.New()
+
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	// Routes
+	e.GET("/", func(c echo.Context) error {
+		return c.String(200, "Hello, World!")
+	})
+
+	// Start server
+	e.Logger.Fatal(e.Start(":8080"))
+}
