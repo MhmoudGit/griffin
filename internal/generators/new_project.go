@@ -43,6 +43,11 @@ func NewProject(name string) error {
 		return err
 	}
 
+	err = middlewaresTemplate()
+	if err != nil {
+		return err
+	}
+
 	err = jobsTemplate()
 	if err != nil {
 		return err
@@ -242,6 +247,32 @@ func validatorGoTemplate() error {
 	}
 
 	err = tmpl.Execute(validatorGoFile, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func middlewaresTemplate() error {
+	log.Info("creating /middlewares/")
+	if err := os.Mkdir("middlewares", os.ModePerm); err != nil {
+		return err
+	}
+
+	log.Info("creating /middlewares/pagination.go")
+	paginationFile, err := os.Create("./middlewares/pagination.go")
+	if err != nil {
+		return err
+	}
+	defer paginationFile.Close()
+
+	tmpl, err := template.ParseFS(templates.FS, "project/middlewares/pagination.go.tmpl")
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %v", err)
+	}
+
+	err = tmpl.Execute(paginationFile, nil)
 	if err != nil {
 		return err
 	}

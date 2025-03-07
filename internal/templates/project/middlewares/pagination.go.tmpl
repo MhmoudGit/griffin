@@ -1,0 +1,52 @@
+package middlewares
+
+import (
+	"strconv"
+
+	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
+)
+
+type PaginatedResponse struct {
+	Items interface{} `json:"items"`
+	Total int64       `json:"total"`
+	Page  int         `json:"page"`
+	Size  int         `json:"size"`
+	Pages int         `json:"pages"`
+}
+
+// PaginationScope applies pagination to the query
+func PaginationScope(page, size int) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		offset := (page - 1) * size
+		return db.Offset(offset).Limit(size)
+	}
+}
+
+func PaginationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		// Default values
+		page := 1
+		size := 10
+
+		// Get 'page' from query string, if present
+		if p := c.QueryParam("page"); p != "" {
+			if pInt, err := strconv.Atoi(p); err == nil {
+				page = pInt
+			}
+		}
+
+		// Get 'size' from query string, if present
+		if s := c.QueryParam("size"); s != "" {
+			if sInt, err := strconv.Atoi(s); err == nil {
+				size = sInt
+			}
+		}
+
+		// Set pagination values in the context
+		c.Set("page", page)
+		c.Set("size", size)
+
+		return next(c)
+	}
+}
