@@ -33,12 +33,22 @@ func NewProject(name string) error {
 		return err
 	}
 
+	err = databaseTemplate(data)
+	if err != nil {
+		return err
+	}
+
 	err = configTemplate(data)
 	if err != nil {
 		return err
 	}
 
 	err = jobsTemplate()
+	if err != nil {
+		return err
+	}
+
+	err = errorsTemplate()
 	if err != nil {
 		return err
 	}
@@ -75,6 +85,32 @@ func mainTemplate(data Data) error {
 	}
 
 	err = tmpl.Execute(mainFile, data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func databaseTemplate(data Data) error {
+	log.Info("creating /database/")
+	if err := os.Mkdir("database", os.ModePerm); err != nil {
+		return err
+	}
+
+	log.Info("creating /database/postgres.go")
+	databaseFile, err := os.Create("./database/postgres.go")
+	if err != nil {
+		return err
+	}
+	defer databaseFile.Close()
+
+	tmpl, err := template.ParseFS(templates.FS, "project/database/postgres.go.tmpl")
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %v", err)
+	}
+
+	err = tmpl.Execute(databaseFile, data)
 	if err != nil {
 		return err
 	}
@@ -267,6 +303,32 @@ func uploadsGoTemplate() error {
 	}
 
 	err = tmpl.Execute(uploadsGoFile, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func errorsTemplate() error {
+	log.Info("creating /errors/")
+	if err := os.Mkdir("errors", os.ModePerm); err != nil {
+		return err
+	}
+
+	log.Info("creating /errors/errors.go")
+	errorsFile, err := os.Create("./errors/errors.go")
+	if err != nil {
+		return err
+	}
+	defer errorsFile.Close()
+
+	tmpl, err := template.ParseFS(templates.FS, "project/errors/errors.go.tmpl")
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %v", err)
+	}
+
+	err = tmpl.Execute(errorsFile, nil)
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,63 @@
+package database
+
+import (
+	"fmt"
+
+	"{{.ProjectName}}/config"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+)
+
+type Postgres struct {
+	DB       *gorm.DB
+	Host     string
+	Port     int
+	User     string
+	Password string
+	Name     string
+}
+
+// NewPostgresDatabase creates a new Postgres instance, connects to the database, and performs migrations.
+func NewPostgresDatabase(cfg *config.Config) (*Postgres, error) {
+	pg := &Postgres{
+		Host:     cfg.Database.Host,
+		Port:     cfg.Database.Port,
+		User:     cfg.Database.User,
+		Password: cfg.Database.Password,
+		Name:     cfg.Database.Name,
+	}
+
+	if err := pg.Connect(); err != nil {
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	return pg, nil
+}
+
+// Connect establishes a connection to the PostgreSQL database.
+func (pg *Postgres) Connect() error {
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		pg.Host, pg.Port, pg.User, pg.Password, pg.Name)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return fmt.Errorf("error connecting to the database: %w", err)
+	}
+
+	pg.DB = db
+	return nil
+}
+
+// Disconnect closes the database connection.
+func (pg *Postgres) Disconnect() error {
+	dbInstance, err := pg.DB.DB()
+	if err != nil {
+		return fmt.Errorf("error getting database instance: %w", err)
+	}
+
+	if err := dbInstance.Close(); err != nil {
+		return fmt.Errorf("error closing database connection: %w", err)
+	}
+	return nil
+}

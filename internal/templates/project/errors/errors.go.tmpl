@@ -1,0 +1,31 @@
+package errors
+
+import (
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+)
+
+func UnproccessedEntityErr(msg interface{}) *echo.HTTPError {
+	return echo.NewHTTPError(http.StatusUnprocessableEntity, msg)
+}
+
+func BadRequestErr(msg interface{}) *echo.HTTPError {
+	return echo.NewHTTPError(http.StatusBadRequest, msg)
+}
+
+func InternalServerErr(msg interface{}) *echo.HTTPError {
+	return echo.NewHTTPError(http.StatusInternalServerError, msg)
+}
+
+func ForbiddenErr() *echo.HTTPError {
+	return echo.NewHTTPError(http.StatusForbidden, "forbidden")
+}
+
+func UnauthorizedErr() *echo.HTTPError {
+	return echo.NewHTTPError(http.StatusUnauthorized, "unauthorized")
+}
+
+func NotFoundErr(msg interface{}) *echo.HTTPError {
+	return echo.NewHTTPError(http.StatusNotFound, msg)
+}

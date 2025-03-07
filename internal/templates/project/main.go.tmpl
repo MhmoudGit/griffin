@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 
-	"project/config"
+	"{{.ProjectName}}/config"
+	"{{.ProjectName}}/database"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -15,8 +16,17 @@ func main() {
 	// Load configuration
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("Failed to load config: %v", err)
+		slog.Error("failed to load config: ", "error", err)
+		return
 	}
+
+	// Connect Postgres
+	pg, err := database.NewPostgresDatabase(cfg)
+	if err != nil {
+		slog.Error("failed to load config: ", "error", err)
+		return
+	}
+	slog.Info("Postgres database connected successfully")
 
 	// Create a new Echo instance
 	e := echo.New()
@@ -30,7 +40,7 @@ func main() {
 
 	// Routes
 	e.GET("/", func(c echo.Context) error {
-		return c.JSON(200, echo.Map{"message": "Hello, World!"})
+		return c.JSON(200, echo.Map{"message": "Hello, World!", "database_name": pg.Name})
 	})
 
 	// Start server using the port from the configuration
