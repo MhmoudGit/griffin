@@ -2,6 +2,7 @@ package cli
 
 import (
 	"griffin/internal/log"
+	"griffin/internal/server"
 
 	"github.com/spf13/cobra"
 )
@@ -11,7 +12,11 @@ var serverCmd = &cobra.Command{
 	Short: "Run Server",
 	Long:  `Run Server`,
 	Run: func(cmd *cobra.Command, args []string) {
-		log.Print("run server")
+		err := server.Start()
+		if err != nil {
+			log.Error("Error:", err)
+			return
+		}
 	},
 }
 
