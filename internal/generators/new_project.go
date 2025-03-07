@@ -38,6 +38,11 @@ func NewProject(name string) error {
 		return err
 	}
 
+	err = jobsTemplate()
+	if err != nil {
+		return err
+	}
+
 	err = gitignoreTemplate()
 	if err != nil {
 		return err
@@ -95,6 +100,7 @@ func configTemplate(data Data) error {
 		return err
 	}
 
+	log.Info("creating /config/")
 	if err := os.Mkdir("config", os.ModePerm); err != nil {
 		return err
 	}
@@ -131,7 +137,7 @@ func configGoTemplate() error {
 	}
 	defer configGoFile.Close()
 
-	tmpl, err := template.ParseFS(templates.FS, "project/config.go.tmpl")
+	tmpl, err := template.ParseFS(templates.FS, "project/config/config.go.tmpl")
 	if err != nil {
 		return fmt.Errorf("failed to parse template: %v", err)
 	}
@@ -152,7 +158,7 @@ func corsGoTemplate() error {
 	}
 	defer corsGoFile.Close()
 
-	tmpl, err := template.ParseFS(templates.FS, "project/cors.go.tmpl")
+	tmpl, err := template.ParseFS(templates.FS, "project/config/cors.go.tmpl")
 	if err != nil {
 		return fmt.Errorf("failed to parse template: %v", err)
 	}
@@ -173,7 +179,7 @@ func loggerGoTemplate() error {
 	}
 	defer loggerGoFile.Close()
 
-	tmpl, err := template.ParseFS(templates.FS, "project/logger.go.tmpl")
+	tmpl, err := template.ParseFS(templates.FS, "project/config/logger.go.tmpl")
 	if err != nil {
 		return fmt.Errorf("failed to parse template: %v", err)
 	}
@@ -194,12 +200,73 @@ func validatorGoTemplate() error {
 	}
 	defer validatorGoFile.Close()
 
-	tmpl, err := template.ParseFS(templates.FS, "project/validator.go.tmpl")
+	tmpl, err := template.ParseFS(templates.FS, "project/config/validator.go.tmpl")
 	if err != nil {
 		return fmt.Errorf("failed to parse template: %v", err)
 	}
 
 	err = tmpl.Execute(validatorGoFile, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func jobsTemplate() error {
+	log.Info("creating /jobs/")
+	if err := os.Mkdir("jobs", os.ModePerm); err != nil {
+		return err
+	}
+
+	err := emailsGoTemplate()
+	if err != nil {
+		return err
+	}
+
+	err = uploadsGoTemplate()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func emailsGoTemplate() error {
+	log.Info("creating /jobs/emails.go")
+	emailsGoFile, err := os.Create("jobs/emails.go")
+	if err != nil {
+		return err
+	}
+	defer emailsGoFile.Close()
+
+	tmpl, err := template.ParseFS(templates.FS, "project/jobs/emails.go.tmpl")
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %v", err)
+	}
+
+	err = tmpl.Execute(emailsGoFile, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func uploadsGoTemplate() error {
+	log.Info("creating /jobs/uploads.go")
+	uploadsGoFile, err := os.Create("jobs/uploads.go")
+	if err != nil {
+		return err
+	}
+	defer uploadsGoFile.Close()
+
+	tmpl, err := template.ParseFS(templates.FS, "project/jobs/uploads.go.tmpl")
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %v", err)
+	}
+
+	err = tmpl.Execute(uploadsGoFile, nil)
 	if err != nil {
 		return err
 	}

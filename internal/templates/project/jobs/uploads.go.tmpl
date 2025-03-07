@@ -1,0 +1,64 @@
+package jobs
+
+import (
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
+	"github.com/labstack/echo/v4"
+)
+
+func UploadFile(c echo.Context, fieldName string, allowedExtensions []string, uploadDir string) (string, error) {
+	file, err := c.FormFile(fieldName)
+	if err != nil {
+		return "", err
+	}
+	src, err := file.Open()
+	if err != nil {
+		return "", err
+	}
+	defer src.Close()
+
+	ext := strings.ToLower(filepath.Ext(file.Filename))
+	if !isValidExtension(ext, allowedExtensions) {
+		return "", echo.NewHTTPError(http.StatusBadRequest, "invalid file extension")
+	}
+
+	uniqueFilename := generateUniqueFilename(ext)
+	filePath := filepath.Join(uploadDir, uniqueFilename)
+
+	newFile, err := os.Create(filePath)
+	if err != nil {
+		return "", echo.NewHTTPError(http.StatusBadRequest, "unable to create file")
+	}
+	defer newFile.Close()
+
+	_, err = io.Copy(newFile, src)
+	if err != nil {
+		return "", echo.NewHTTPError(http.StatusBadRequest, "unable to save file")
+	}
+
+	return uniqueFilename, nil
+}
+
+func DeleteFile(filePath string, uploadDir string) error {
+	path := strings.Replace(filePath, "/uploads", uploadDir, 1)
+	return os.Remove(path)
+}
+
+func isValidExtension(extension string, allowedExtensions []string) bool {
+	for _, ext := range allowedExtensions {
+		if ext == extension {
+			return true
+		}
+	}
+	return false
+}
+
+func generateUniqueFilename(ext string) string {
+	return fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
+}

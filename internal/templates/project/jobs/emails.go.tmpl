@@ -1,0 +1,22 @@
+package jobs
+
+import (
+	"fmt"
+	"net/smtp"
+)
+
+func SendEmail(from, password, to, subject, body string) error {
+	// SMTP server configuration
+	smtpHost := "smtp.gmail.com"
+	smtpPort := "587"
+
+	// Message headers and body
+	msg := []byte(fmt.Sprintf("To: %s\r\nSubject: %s\r\nMIME-version: 1.0;\r\nContent-Type: text/html; charset=\"UTF-8\";\r\n\r\n%s", to, subject, body))
+
+	// Authentication
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+
+	// Sending the email
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, msg)
+	return err
+}
