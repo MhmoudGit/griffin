@@ -18,6 +18,7 @@ var newCmd = &cobra.Command{
 			return
 		}
 		log.Success("Project created successfully: ", projectName)
+		log.Print("$ cd ", projectName, " // to start developing")
 	},
 }
 

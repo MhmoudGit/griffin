@@ -9,24 +9,36 @@ import (
 	"os/exec"
 )
 
+type Data struct {
+	ProjectName string
+}
+
 func NewProject(name string) error {
 	log.Info("creating new project: ", name)
+
+	data := Data{
+		ProjectName: name,
+	}
 
 	if err := os.Mkdir(name, os.ModePerm); err != nil {
 		return err
 	}
 
-	err := mainTemplate(name)
+	if err := os.Chdir(name); err != nil {
+		return fmt.Errorf("failed to change to project directory: %v", err)
+	}
+
+	err := mainTemplate(data)
 	if err != nil {
 		return err
 	}
 
-	err = configTemplate(name)
+	err = configTemplate(data)
 	if err != nil {
 		return err
 	}
 
-	err = gitignoreTemplate(name)
+	err = gitignoreTemplate()
 	if err != nil {
 		return err
 	}
@@ -44,8 +56,9 @@ func NewProject(name string) error {
 	return nil
 }
 
-func mainTemplate(name string) error {
-	mainFile, err := os.Create(name + "/main.go")
+func mainTemplate(data Data) error {
+	log.Info("creating /main.go")
+	mainFile, err := os.Create("./main.go")
 	if err != nil {
 		return err
 	}
@@ -56,7 +69,7 @@ func mainTemplate(name string) error {
 		return fmt.Errorf("failed to parse template: %v", err)
 	}
 
-	err = tmpl.Execute(mainFile, nil)
+	err = tmpl.Execute(mainFile, data)
 	if err != nil {
 		return err
 	}
@@ -64,12 +77,9 @@ func mainTemplate(name string) error {
 	return nil
 }
 
-type ConfigData struct {
-	Name string
-}
-
-func configTemplate(name string) error {
-	configFile, err := os.Create(name + "/config.yaml")
+func configTemplate(data Data) error {
+	log.Info("creating /config.yaml")
+	configFile, err := os.Create("./config.yaml")
 	if err != nil {
 		return err
 	}
@@ -80,11 +90,12 @@ func configTemplate(name string) error {
 		return fmt.Errorf("failed to parse template: %v", err)
 	}
 
-	data := ConfigData{
-		Name: name,
+	err = tmpl.Execute(configFile, data)
+	if err != nil {
+		return err
 	}
 
-	err = tmpl.Execute(configFile, data)
+	err = configGoTemplate()
 	if err != nil {
 		return err
 	}
@@ -92,8 +103,34 @@ func configTemplate(name string) error {
 	return nil
 }
 
-func gitignoreTemplate(name string) error {
-	gitignoreFile, err := os.Create(name + "/.gitignore")
+func configGoTemplate() error {
+	log.Info("creating /config/config.go")
+	if err := os.Mkdir("config", os.ModePerm); err != nil {
+		return err
+	}
+
+	configGoFile, err := os.Create("config/config.go")
+	if err != nil {
+		return err
+	}
+	defer configGoFile.Close()
+
+	tmpl, err := template.ParseFS(templates.FS, "project/config.go.tmpl")
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %v", err)
+	}
+
+	err = tmpl.Execute(configGoFile, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func gitignoreTemplate() error {
+	log.Info("creating /.gitignore")
+	gitignoreFile, err := os.Create("./.gitignore")
 	if err != nil {
 		return err
 	}
@@ -113,13 +150,9 @@ func gitignoreTemplate(name string) error {
 }
 
 func initGoModule(projectDir string) error {
-	if err := os.Chdir(projectDir); err != nil {
-		return fmt.Errorf("failed to change to project directory: %v", err)
-	}
-
 	cmd := exec.Command("go", "mod", "init", projectDir)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Stdout = log.StdWriter
+	cmd.Stderr = log.StdWriter
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to initialize Go module: %v", err)
@@ -131,13 +164,13 @@ func initGoModule(projectDir string) error {
 
 func installDependencies() error {
 	cmd := exec.Command("go", "mod", "tidy")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Stdout = log.StdWriter
+	cmd.Stderr = log.StdWriter
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("failed to install dependencies: %v", err)
 	}
 
-	fmt.Println("Dependencies installed successfully.")
+	log.Success("dependencies installed successfully.")
 	return nil
 }
