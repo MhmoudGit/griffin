@@ -16,6 +16,7 @@ type Postgres struct {
 	User     string
 	Password string
 	Name     string
+	SSLMode string
 }
 
 // NewPostgresDatabase creates a new Postgres instance, connects to the database, and performs migrations.
@@ -26,6 +27,7 @@ func NewPostgresDatabase(cfg *config.Config) (*Postgres, error) {
 		User:     cfg.Database.User,
 		Password: cfg.Database.Password,
 		Name:     cfg.Database.Name,
+		SSLMode: cfg.Database.SSLMode,
 	}
 
 	if err := pg.Connect(); err != nil {
@@ -37,8 +39,8 @@ func NewPostgresDatabase(cfg *config.Config) (*Postgres, error) {
 
 // Connect establishes a connection to the PostgreSQL database.
 func (pg *Postgres) Connect() error {
-	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		pg.Host, pg.Port, pg.User, pg.Password, pg.Name)
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=%s",
+		pg.Host, pg.Port, pg.User, pg.Password, pg.Name, pg.SSLMode)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {

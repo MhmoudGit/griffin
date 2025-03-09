@@ -6,34 +6,26 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Config holds the application configuration
 type Config struct {
-	Server struct {
-		Port int `mapstructure:"port"`
-	} `mapstructure:"server"`
 	Database struct {
 		Host     string `mapstructure:"host"`
 		Port     int    `mapstructure:"port"`
 		User     string `mapstructure:"user"`
 		Password string `mapstructure:"password"`
-		Name     string `mapstructure:"name"`
-		SSLMode     string `mapstructure:"sslmode"`
+		Name   string `mapstructure:"name"`
+		SSLMode  string `mapstructure:"sslmode"`
 	} `mapstructure:"database"`
 }
 
-// LoadConfig loads the configuration from config.yaml
-func Load() (*Config, error) {
-	// Set the configuration file name and path
+func LoadConfig() (*Config, error) {
 	viper.SetConfigName("config") // Name of the config file (without extension)
 	viper.SetConfigType("yaml")   // Type of the config file
 	viper.AddConfigPath(".")      // Path to look for the config file (current directory)
 
-	// Read the configuration file
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("failed to read config file: %v", err)
 	}
 
-	// Unmarshal the configuration into the Config struct
 	var config Config
 	if err := viper.Unmarshal(&config); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal config: %v", err)
