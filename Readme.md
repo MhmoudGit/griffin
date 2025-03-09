@@ -28,6 +28,9 @@ griffin new my_project
 ```
 This command will create a new project directory with the necessary structure to get started.
 
+## Create a database
+Make sure to create a postgres database with the same name as the new project's name, or change the config.yaml after project generation
+
 ## Generate CRUD Code for a Resource
 ```bash 
 griffin gen posts title:string body:string
