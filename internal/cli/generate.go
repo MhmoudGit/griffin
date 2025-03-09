@@ -2,11 +2,12 @@ package cli
 
 import (
 	"fmt"
-	"griffin/internal/generators"
-	"griffin/internal/log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/MhmoudGit/griffin/internal/generators"
+	"github.com/MhmoudGit/griffin/internal/log"
 
 	"github.com/spf13/cobra"
 )

@@ -3,8 +3,9 @@ package cli
 import (
 	"database/sql"
 	"fmt"
-	"griffin/internal/config"
-	"griffin/internal/log"
+
+	"github.com/MhmoudGit/griffin/internal/config"
+	"github.com/MhmoudGit/griffin/internal/log"
 
 	"github.com/pressly/goose"
 	"github.com/spf13/cobra"

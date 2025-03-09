@@ -1,8 +1,8 @@
 package cli
 
 import (
-	"griffin/internal/log"
-	"griffin/internal/server"
+	"github.com/MhmoudGit/griffin/internal/log"
+	"github.com/MhmoudGit/griffin/internal/server"
 
 	"github.com/spf13/cobra"
 )

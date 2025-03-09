@@ -2,12 +2,13 @@ package generators
 
 import (
 	"fmt"
-	"griffin/internal/log"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/MhmoudGit/griffin/internal/log"
 )
 
 func GenerateMigration(resource string, fields []string) error {

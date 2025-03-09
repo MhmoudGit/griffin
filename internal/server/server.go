@@ -3,13 +3,14 @@ package server
 import (
 	"context"
 	"fmt"
-	"griffin/internal/log"
 	"os"
 	"os/exec"
 	"os/signal"
 	"runtime"
 	"syscall"
 	"time"
+
+	"github.com/MhmoudGit/griffin/internal/log"
 )
 
 func Start() error {

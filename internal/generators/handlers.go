@@ -2,9 +2,10 @@ package generators
 
 import (
 	"fmt"
-	"griffin/internal/log"
 	"html/template"
 	"os"
+
+	"github.com/MhmoudGit/griffin/internal/log"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -111,7 +112,7 @@ func (h *{{.Resource}}Handler) Delete(c echo.Context) error {
 	}
 
 	data := map[string]interface{}{
-		"Package": resource,
+		"Package":     resource,
 		"Resource":    cases.Title(language.Und, cases.NoLower).String(resource), // Capitalize the resource name
 		"ProjectName": projectName,
 	}

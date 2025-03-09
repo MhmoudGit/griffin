@@ -2,11 +2,12 @@ package generators
 
 import (
 	"fmt"
-	"griffin/internal/log"
-	"griffin/internal/templates"
 	"html/template"
 	"os"
 	"os/exec"
+
+	"github.com/MhmoudGit/griffin/internal/log"
+	"github.com/MhmoudGit/griffin/internal/templates"
 )
 
 type Data struct {

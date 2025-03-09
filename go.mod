@@ -1,4 +1,4 @@
-module griffin
+module github.com/MhmoudGit/griffin
 
 go 1.24.0
 

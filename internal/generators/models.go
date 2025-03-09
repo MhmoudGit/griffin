@@ -2,10 +2,11 @@ package generators
 
 import (
 	"fmt"
-	"griffin/internal/log"
 	"html/template"
 	"os"
 	"strings"
+
+	"github.com/MhmoudGit/griffin/internal/log"
 
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
