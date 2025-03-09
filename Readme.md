@@ -17,7 +17,7 @@ Griffin integrates seamlessly with the Echo web framework and GORM ORM, providin
 ## Installation
 To install Griffin, ensure you have Go installed on your system, then run:
 ```bash
-go install github.com/yourusername/griffin@latest
+go install github.com/MhmoudGit/griffin/cmd/griffin@latest
 ```
 ## Usage
 Griffin provides a set of commands to help you manage your Go web application:
